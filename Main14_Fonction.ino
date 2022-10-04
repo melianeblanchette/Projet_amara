@@ -352,8 +352,7 @@ void loop() {
   Continue = 0;
   ActivMain = 0;
   if (Xbox.getButtonClick(START)) {
-    Serial.println(F("Start"));
-    Etat = 100;
+    MENU_MODE();
   }
   //  Serial.println(Bout5);
   //  EMG = Bout5;
@@ -510,6 +509,69 @@ void loop() {
   //
   //
   //  }
+  switch (Mode) {
+    //Mode normal
+    case 1:
+      MANETTE();
+      if (Etat == 1) {
+        Start = 1;
+        PAbF[0] = PBouche[0];
+        PAbF[1] = PBouche[1];
+        PAbF[2] = PBouche[2];
+        COMMANDES_MOTEURS();
+        delay(5000);
+        PAbF[0] = PRepos[0];
+        PAbF[1] = PRepos[1];
+        PAbF[2] = PRepos[2];
+      }
+      break;
+
+    //Mode prototypage
+    case 2:
+      MANETTE();
+      if (Etat == 1) {
+        Start = 1;
+        PAbF[0] = PBouche[0];
+        PAbF[1] = PBouche[1];
+        PAbF[2] = PBouche[2];
+      }
+      else if (Etat == 2) {
+        Start = 1;
+        PAbF[0] = PRepos[0];
+        PAbF[1] = PRepos[1];
+        PAbF[2] = PRepos[2];
+      }
+      //Deplacement avant arriere (X)
+      else if (Etat == 11) {
+        Start = 1;
+        PAbF[0] = PAbF[0] + DManuel;
+      }
+      else if (Etat == 12) {
+        Start = 1;
+        PAbF[0] = PAbF[0] - DManuel;
+      }
+      //Deplacement Droite gauche (Y)
+      else if (Etat == 13) {
+        Start = 1;
+        PAbF[1] = PAbF[1] + DManuel;
+      }
+      else if (Etat == 14) {
+        Start = 1;
+        PAbF[1] = PAbF[1] - DManuel;
+      }
+      //D/placement up down (Z)
+      else if (Etat == 25) {
+        Start = 1;
+        PAbF[2] = PAbF[2] + DManuel;
+      }
+      else if (Etat == 26) {
+        Start = 1;
+        PAbF[2] = PAbF[2] - DManuel;
+      }
+      
+
+  }
+
   COMMANDES_MOTEURS();
   ROTATION_MAIN();
   IMPRESSION();
@@ -643,6 +705,7 @@ void COMMANDES_MOTEURS() {
 
     }
   }
+  Etat = 0;
 }
 //-------------------Détection des positions du bras----------------------------------------------------------------------------------
 void POSITION() {
@@ -709,9 +772,9 @@ void MENU_MODE() {
   Etat = 0;
   double Temps = millis();
   double Compteur = 0;
-  while ((Etat != 300) || (Etat != 1) || (Etat != 2) || (Etat != 3)) {
+  while ((Etat != 100) || (Etat != 1) || (Etat != 2) || (Etat != 3)) {
     MANETTE();
-    if (((millis() - Temps) >= 15000) || (Etat == 300)) {
+    if (((millis() - Temps) >= 15000) || (Etat == 100)) {
       lod.clear();
       lod.setCursor(7, 0);
       lod.print("Aucun");
